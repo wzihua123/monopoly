@@ -1,0 +1,290 @@
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 游戏信息样式 */
+.game-info {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+  margin-bottom: 30rpx;
+}
+
+.player-stats {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.stat-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 骰子区域样式 */
+.dice-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 40rpx 0;
+  perspective: 1000rpx;
+}
+
+.dice-wrapper {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 40rpx;
+}
+
+.dice {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.dice-face {
+  font-size: 80rpx;
+  color: #333;
+  transform-style: preserve-3d;
+}
+
+.dice-shadow {
+  position: absolute;
+  bottom: -10rpx;
+  left: 10rpx;
+  right: 10rpx;
+  height: 20rpx;
+  background: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  filter: blur(5rpx);
+  transform: scaleX(0.8);
+  z-index: 1;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.dice-animate {
+  animation: roll 0.8s ease-out;
+}
+
+.shadow-animate {
+  animation: shadow 0.8s ease-out;
+}
+
+@keyframes roll {
+  0% { 
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  30% {
+    transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg);
+  }
+  60% {
+    transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg);
+  }
+  100% { 
+    transform: rotateX(1800deg) rotateY(1080deg) rotateZ(540deg);
+  }
+}
+
+@keyframes shadow {
+  0% {
+    transform: scaleX(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scaleX(0.8);
+    opacity: 0.5;
+  }
+}
+
+.roll-button {
+  min-width: 200rpx;
+  background: #1890ff;
+  color: white;
+  border-radius: 40rpx;
+  padding: 20rpx 60rpx;
+  font-size: 32rpx;
+  border: none;
+  box-shadow: 0 4rpx 20rpx rgba(24,144,255,0.3);
+  transition: all 0.3s ease;
+}
+
+.button-disabled {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+.roll-button[disabled] {
+  background: #ccc;
+  box-shadow: none;
+}
+
+/* 游戏地图样式 */
+.game-map {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 20rpx;
+}
+
+.map-cell {
+  background: white;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  min-height: 120rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.current {
+  background: #e6f7ff;
+  border: 2rpx solid #1890ff;
+  transform: scale(1.05);
+}
+
+.cell-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.cell-content {
+  flex: 1;
+}
+
+.cell-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.cell-desc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 奖励提示样式 */
+.reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 20rpx 40rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.show-reward {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* 规则按钮样式 */
+.rules-button {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  width: 80rpx;
+  height: 80rpx;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.2);
+}
+
+.rules-icon {
+  font-size: 40rpx;
+}
+
+.achievements {
+  font-size: 28rpx;
+  color: #666;
+}
+
+button {
+  margin-top: 20rpx;
+  background-color: #1890ff;
+  color: white;
+}
+
+button[disabled] {
+  background-color: #ccc;
+}
+
+/* 等级相关样式 */
+.level-info {
+  width: 100%;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.level-title {
+  font-size: 32rpx;
+  color: #1890ff;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.level-number {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.exp-bar {
+  width: 100%;
+  height: 20rpx;
+  background: #eee;
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin-bottom: 10rpx;
+}
+
+.exp-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #1890ff, #36cfc9);
+  transition: width 0.3s ease;
+}
+
+.exp-text {
+  font-size: 24rpx;
+  color: #999;
+} 

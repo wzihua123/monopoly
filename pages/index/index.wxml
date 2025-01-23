@@ -1,0 +1,66 @@
+<view class="container">
+  <!-- 游戏信息 -->
+  <view class="game-info">
+    <view class="level-info">
+      <view class="level-title">{{player.levelTitles[player.level-1]}}</view>
+      <view class="level-number">Lv.{{player.level}}</view>
+      <view class="exp-bar">
+        <view class="exp-progress" style="width: {{player.exp/player.levelExp[player.level]*100}}%"></view>
+      </view>
+      <view class="exp-text">{{player.exp}}/{{player.levelExp[player.level]}}</view>
+    </view>
+    <view class="player-stats">
+      <view class="stat-item">
+        <view class="stat-icon">💰</view>
+        <view class="stat-value">{{player.money}}</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-icon">⭐</view>
+        <view class="stat-value">{{player.score}}/{{targetScore}}</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-icon">🏆</view>
+        <view class="stat-value">{{player.achievements.length}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 骰子区域 -->
+  <view class="dice-section">
+    <view class="dice-wrapper">
+      <view class="dice {{diceAnimating ? 'dice-animate' : ''}}" 
+            style="transform: rotate({{diceRotation}}deg)">
+        <text class="dice-face">{{diceFaces[diceNumber]}}</text>
+      </view>
+      <view class="dice-shadow {{diceAnimating ? 'shadow-animate' : ''}}"></view>
+    </view>
+    <button class="roll-button {{diceAnimating ? 'button-disabled' : ''}}" 
+            bindtap="rollDice" 
+            disabled="{{gameOver || diceAnimating}}">
+      {{diceAnimating ? '骰子翻滚中...' : '掷骰子'}}
+    </button>
+  </view>
+
+  <!-- 奖励提示 -->
+  <view class="reward-popup {{showReward ? 'show-reward' : ''}}">
+    {{rewardText}}
+  </view>
+
+  <!-- 游戏地图 -->
+  <view class="game-map">
+    <view wx:for="{{mapCells}}" 
+          wx:key="id" 
+          class="map-cell {{player.position === index ? 'current' : ''}}">
+      <view class="cell-icon">{{item.icon}}</view>
+      <view class="cell-content">
+        <text class="cell-name">{{item.name}}</text>
+        <text class="cell-desc">{{item.description}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 游戏规则说明 -->
+<view class="rules-button" bindtap="showRules">
+  <text class="rules-icon">❓</text>
+</view> 
