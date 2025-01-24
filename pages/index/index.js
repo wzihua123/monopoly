@@ -130,7 +130,8 @@ Page({
       happyTarget: 0,
       honorTarget: 0
     },
-    showTargetSetup: false
+    showTargetSetup: false,
+    remaining: 0
   },
 
   onLoad() {
@@ -155,15 +156,9 @@ Page({
           'targetSetup.moneyTarget': 0,
           'targetSetup.happyTarget': 0,
           'targetSetup.honorTarget': 0,
-          showTargetSetup: true  // 显示目标设置界面
-        });
-
-        // 显示设置引导
-        wx.showModal({
-          title: '设置目标值',
-          content: `请为三个属性分配总计 ${totalTarget} 分：\n\n💰 金钱值：物质财富的象征\n😊 幸福值：生活品质的体现\n🏅 名誉值：社会地位的标志\n\n三个属性都达到目标值才能获得胜利！`,
-          showCancel: false,
-          confirmText: '开始设置'
+          showTargetSetup: true,
+          gameInitialized: false,
+          remaining: totalTarget
         });
       }
     });
@@ -171,7 +166,7 @@ Page({
 
   adjustTarget(e) {
     const { type, action } = e.currentTarget.dataset;
-    const currentValue = this.data.targetSetup[`${type}Target`];
+    const currentValue = parseInt(this.data.targetSetup[`${type}Target`]) || 0;
     const remaining = this.getRemainingTarget();
     
     let newValue = currentValue;
@@ -189,13 +184,18 @@ Page({
   onTargetInput(e) {
     const { type } = e.currentTarget.dataset;
     const value = parseInt(e.detail.value) || 0;
-    const oldValue = this.data.targetSetup[`${type}Target`];
+    const currentValue = parseInt(this.data.targetSetup[`${type}Target`]) || 0;
     const remaining = this.getRemainingTarget();
-    const maxPossible = oldValue + remaining;
+    const maxPossible = currentValue + remaining;
     
     if (value >= 0 && value <= maxPossible) {
       this.setData({
         [`targetSetup.${type}Target`]: value
+      });
+    } else {
+      wx.showToast({
+        title: `最大可设置值为${maxPossible}`,
+        icon: 'none'
       });
     }
   },
@@ -211,26 +211,28 @@ Page({
     }
     
     const { moneyTarget, happyTarget, honorTarget } = this.data.targetSetup;
+    
     this.setData({
-      'gameTarget.moneyTarget': moneyTarget,
-      'gameTarget.happyTarget': happyTarget,
-      'gameTarget.honorTarget': honorTarget,
+      'gameTarget.moneyTarget': parseInt(moneyTarget) || 0,
+      'gameTarget.happyTarget': parseInt(happyTarget) || 0,
+      'gameTarget.honorTarget': parseInt(honorTarget) || 0,
       showTargetSetup: false,
       gameInitialized: true
+    }, () => {
+      this.startGame();
     });
-    
-    this.startGame();
   },
 
   // 开始游戏
   startGame() {
     const { difficulty, moneyTarget, happyTarget, honorTarget } = this.data.gameTarget;
+    const difficultyName = this.data.difficultySettings[difficulty].name;
+    
     wx.showModal({
       title: '游戏开始！',
-      content: `难度：${this.data.difficultySettings[difficulty].name}\n\n目标：\n金钱值：${moneyTarget}\n幸福值：${happyTarget}\n名誉值：${honorTarget}\n\n开始你的冒险吧！`,
+      content: `难度：${difficultyName}\n\n目标：\n金钱值：${moneyTarget}\n幸福值：${happyTarget}\n名誉值：${honorTarget}\n\n开始你的冒险吧！`,
       showCancel: false,
       success: () => {
-        Debugger.init(this);
         this.initGame();
       }
     });
@@ -241,7 +243,10 @@ Page({
     this.setData({
       targetScore: targetScore,
       scorePercentage: 0,
-      expPercentage: 0
+      expPercentage: 0,
+      'player.moneyScore': 0,
+      'player.happyScore': 0,
+      'player.honorScore': 0
     });
   },
 
@@ -903,8 +908,8 @@ ${this.data.player.exp}/${this.data.levelExp[newLevel]}`,
 
   // 获取剩余可分配分数
   getRemainingTarget() {
-    const { totalTarget } = this.data.gameTarget;
+    const totalTarget = this.data.gameTarget.totalTarget;
     const { moneyTarget, happyTarget, honorTarget } = this.data.targetSetup;
-    return totalTarget - moneyTarget - happyTarget - honorTarget;
+    return totalTarget - (parseInt(moneyTarget) || 0) - (parseInt(happyTarget) || 0) - (parseInt(honorTarget) || 0);
   }
 }); 
