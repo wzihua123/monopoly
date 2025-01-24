@@ -1,13 +1,18 @@
 <view class="container">
   <!-- 游戏信息 -->
   <view class="game-info">
-    <view class="level-info">
-      <view class="level-title">{{player.levelTitles[player.level-1]}}</view>
+    <view class="level-info" bindtap="showLevelInfo">
+      <view class="level-title">{{levelTitles[player.level-1]}}</view>
       <view class="level-number">Lv.{{player.level}}</view>
-      <view class="exp-bar">
-        <view class="exp-progress" style="width: {{player.exp/player.levelExp[player.level]*100}}%"></view>
+      <view class="exp-bar-container">
+        <view class="exp-bar">
+          <view class="exp-progress" 
+                style="width: {{getExpPercentage()}}%">
+          </view>
+        </view>
       </view>
-      <view class="exp-text">{{player.exp}}/{{player.levelExp[player.level]}}</view>
+      <view class="level-desc">{{levelDescriptions[player.level]}}</view>
+      <view class="level-tip">点击查看等级详情</view>
     </view>
     <view class="player-stats">
       <view class="stat-item">
@@ -61,6 +66,55 @@
 </view>
 
 <!-- 游戏规则说明 -->
-<view class="rules-button" bindtap="showRules">
-  <text class="rules-icon">❓</text>
-</view> 
+<view class="action-buttons">
+  <view class="rules-button" bindtap="showRules">
+    <text class="rules-icon">❓</text>
+  </view>
+  <view class="achievement-button" bindtap="showAchievements">
+    <text class="achievement-icon">🏆</text>
+  </view>
+</view>
+
+<!-- 在最后添加测试面板 -->
+<view class="debug-panel" wx:if="{{debugMode}}">
+  <view class="debug-title">测试面板</view>
+  
+  <view class="debug-section">
+    <text>骰子点数 (1-6):</text>
+    <input type="number" 
+           value="{{testDiceNumber}}"
+           bindinput="setTestDiceNumber"
+           class="debug-input"/>
+  </view>
+
+  <view class="debug-section">
+    <text>快速设置:</text>
+    <view class="debug-buttons">
+      <button size="mini" 
+              data-attribute="money" 
+              data-value="10000" 
+              bindtap="setPlayerAttribute">金币+10000</button>
+      <button size="mini" 
+              data-attribute="score" 
+              data-value="500" 
+              bindtap="setPlayerAttribute">分数+500</button>
+      <button size="mini" 
+              data-attribute="exp" 
+              data-value="1000" 
+              bindtap="setPlayerAttribute">经验+1000</button>
+    </view>
+  </view>
+
+  <view class="debug-info">
+    <text>当前状态:</text>
+    <text>金币: {{player.money}}</text>
+    <text>分数: {{player.score}}</text>
+    <text>等级: {{player.level}}</text>
+    <text>经验: {{player.exp}}</text>
+  </view>
+</view>
+
+<!-- 只在开发环境显示测试模式开关按钮 -->
+<view class="debug-toggle" bindtap="toggleDebugMode" wx:if="{{env === 'dev'}}">
+  <text>{{debugMode ? '关闭测试' : '开启测试'}}</text>
+</view>
