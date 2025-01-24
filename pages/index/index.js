@@ -111,11 +111,129 @@ Page({
     env: 'prod',  // 默认为生产环境
     expPercentage: 0,
     scorePercentage: 0,
+    // 添加新的数据字段
+    gameInitialized: false,
+    gameTarget: {
+      difficulty: '',
+      totalTarget: 0,
+      moneyTarget: 0,
+      happyTarget: 0,
+      honorTarget: 0
+    },
+    difficultySettings: {
+      easy: { total: 60, name: '初等' },
+      medium: { total: 80, name: '中等' },
+      hard: { total: 100, name: '高等' }
+    },
+    targetSetup: {
+      moneyTarget: 0,
+      happyTarget: 0,
+      honorTarget: 0
+    },
+    showTargetSetup: false
   },
 
   onLoad() {
-    Debugger.init(this);
-    this.initGame();
+    this.showDifficultySelect();
+  },
+
+  showDifficultySelect() {
+    wx.showActionSheet({
+      itemList: [
+        '初等难度 (总分60，适合新手)',
+        '中等难度 (总分80，有一定挑战)',
+        '高等难度 (总分100，极具挑战)'
+      ],
+      success: (res) => {
+        const difficulties = ['easy', 'medium', 'hard'];
+        const difficulty = difficulties[res.tapIndex];
+        const totalTarget = this.data.difficultySettings[difficulty].total;
+        
+        this.setData({
+          'gameTarget.difficulty': difficulty,
+          'gameTarget.totalTarget': totalTarget,
+          'targetSetup.moneyTarget': 0,
+          'targetSetup.happyTarget': 0,
+          'targetSetup.honorTarget': 0,
+          showTargetSetup: true  // 显示目标设置界面
+        });
+
+        // 显示设置引导
+        wx.showModal({
+          title: '设置目标值',
+          content: `请为三个属性分配总计 ${totalTarget} 分：\n\n💰 金钱值：物质财富的象征\n😊 幸福值：生活品质的体现\n🏅 名誉值：社会地位的标志\n\n三个属性都达到目标值才能获得胜利！`,
+          showCancel: false,
+          confirmText: '开始设置'
+        });
+      }
+    });
+  },
+
+  adjustTarget(e) {
+    const { type, action } = e.currentTarget.dataset;
+    const currentValue = this.data.targetSetup[`${type}Target`];
+    const remaining = this.getRemainingTarget();
+    
+    let newValue = currentValue;
+    if (action === 'plus' && remaining > 0) {
+      newValue = currentValue + 1;
+    } else if (action === 'minus' && currentValue > 0) {
+      newValue = currentValue - 1;
+    }
+    
+    this.setData({
+      [`targetSetup.${type}Target`]: newValue
+    });
+  },
+
+  onTargetInput(e) {
+    const { type } = e.currentTarget.dataset;
+    const value = parseInt(e.detail.value) || 0;
+    const oldValue = this.data.targetSetup[`${type}Target`];
+    const remaining = this.getRemainingTarget();
+    const maxPossible = oldValue + remaining;
+    
+    if (value >= 0 && value <= maxPossible) {
+      this.setData({
+        [`targetSetup.${type}Target`]: value
+      });
+    }
+  },
+
+  confirmTargets() {
+    const remaining = this.getRemainingTarget();
+    if (remaining !== 0) {
+      wx.showToast({
+        title: `还有${remaining}分未分配`,
+        icon: 'error'
+      });
+      return;
+    }
+    
+    const { moneyTarget, happyTarget, honorTarget } = this.data.targetSetup;
+    this.setData({
+      'gameTarget.moneyTarget': moneyTarget,
+      'gameTarget.happyTarget': happyTarget,
+      'gameTarget.honorTarget': honorTarget,
+      showTargetSetup: false,
+      gameInitialized: true
+    });
+    
+    this.startGame();
+  },
+
+  // 开始游戏
+  startGame() {
+    const { difficulty, moneyTarget, happyTarget, honorTarget } = this.data.gameTarget;
+    wx.showModal({
+      title: '游戏开始！',
+      content: `难度：${this.data.difficultySettings[difficulty].name}\n\n目标：\n金钱值：${moneyTarget}\n幸福值：${happyTarget}\n名誉值：${honorTarget}\n\n开始你的冒险吧！`,
+      showCancel: false,
+      success: () => {
+        Debugger.init(this);
+        this.initGame();
+      }
+    });
   },
 
   initGame() {
@@ -781,5 +899,12 @@ ${this.data.player.exp}/${this.data.levelExp[newLevel]}`,
       expPercentage: attribute === 'exp' ? this.getExpPercentage() : this.data.expPercentage,
       scorePercentage: attribute === 'score' ? (newValue / this.data.targetScore) * 100 : this.data.scorePercentage
     });
+  },
+
+  // 获取剩余可分配分数
+  getRemainingTarget() {
+    const { totalTarget } = this.data.gameTarget;
+    const { moneyTarget, happyTarget, honorTarget } = this.data.targetSetup;
+    return totalTarget - moneyTarget - happyTarget - honorTarget;
   }
 }); 

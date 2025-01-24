@@ -118,3 +118,44 @@
 <view class="debug-toggle" bindtap="toggleDebugMode" wx:if="{{env === 'dev'}}">
   <text>{{debugMode ? '关闭测试' : '开启测试'}}</text>
 </view>
+
+<view class="target-setup" wx:if="{{showTargetSetup}}">
+  <view class="target-header">
+    <text>设置游戏目标 (总分：{{gameTarget.totalTarget}})</text>
+    <text class="remaining">剩余：{{getRemainingTarget()}}</text>
+  </view>
+  
+  <view class="target-items">
+    <view class="target-item">
+      <text>💰 金钱值</text>
+      <view class="target-controls">
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="money" data-action="minus">-</text>
+        <input type="number" value="{{targetSetup.moneyTarget}}" bindinput="onTargetInput" data-type="money"/>
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="money" data-action="plus">+</text>
+      </view>
+    </view>
+
+    <view class="target-item">
+      <text>😊 幸福值</text>
+      <view class="target-controls">
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="happy" data-action="minus">-</text>
+        <input type="number" value="{{targetSetup.happyTarget}}" bindinput="onTargetInput" data-type="happy"/>
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="happy" data-action="plus">+</text>
+      </view>
+    </view>
+
+    <view class="target-item">
+      <text>🏅 名誉值</text>
+      <view class="target-controls">
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="honor" data-action="minus">-</text>
+        <input type="number" value="{{targetSetup.honorTarget}}" bindinput="onTargetInput" data-type="honor"/>
+        <text class="btn-adjust" bindtap="adjustTarget" data-type="honor" data-action="plus">+</text>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn-confirm" bindtap="confirmTargets" disabled="{{getRemainingTarget() !== 0}}">
+    开始游戏
+  </button>
+</view>
+
