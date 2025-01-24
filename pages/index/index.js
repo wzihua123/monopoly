@@ -5,12 +5,15 @@ Page({
     // 玩家数据
     player: {
       name: '玩家',
-      money: 1000,
+      money: 0,        // 实际金币
+      moneyScore: 0,   // 金币积分（每100金币=1积分）
       position: 0,
       score: 0,
       achievements: [],
       level: 1,
-      exp: 0
+      exp: 0,
+      happyScore: 0,   // 幸福值
+      honorScore: 0,   // 名誉值
     },
     // 骰子点数
     diceNumber: 1,
@@ -284,8 +287,8 @@ Page({
             content: `你获得了 ${reward.text}！`,
             showCancel: false,
             success: () => {
+              this.updatePlayerMoney(reward.value);
               this.setData({
-                'player.money': reward.value,
                 'lottery.showLottery': false
               });
               this.initGame();
@@ -515,6 +518,7 @@ Page({
     
     this.setData({
       'player.money': this.data.player.money + reward,
+      'player.moneyScore': this.data.player.moneyScore + Math.floor(reward / 100),
       'stats.totalMoney': this.data.stats.totalMoney + reward
     });
     
@@ -543,6 +547,7 @@ Page({
     
     this.setData({
       'player.money': this.data.player.money + reward,
+      'player.moneyScore': this.data.player.moneyScore + Math.floor(reward / 100),
       'stats.totalMoney': this.data.stats.totalMoney + reward,
       'stats.luckyTimes': this.data.stats.luckyTimes + 1
     });
@@ -589,7 +594,8 @@ Page({
     
     if (reward.type === 'money') {
       this.setData({
-        'player.money': this.data.player.money + reward.amount
+        'player.money': this.data.player.money + reward.amount,
+        'player.moneyScore': this.data.player.moneyScore + Math.floor(reward.amount / 100)
       });
       this.showRewardAnimation(`获得${reward.amount}${reward.text}`);
     } else {
@@ -604,7 +610,8 @@ Page({
     const newMoney = Math.max(0, this.data.player.money - penalty);
     
     this.setData({
-      'player.money': newMoney
+      'player.money': newMoney,
+      'player.moneyScore': this.data.player.moneyScore - Math.floor(penalty / 100)
     });
     
     this.showRewardAnimation(`失去${penalty}金币！😱`);
@@ -623,7 +630,8 @@ Page({
     
     if (treasure.type === 'money') {
       this.setData({
-        'player.money': this.data.player.money + treasure.amount
+        'player.money': this.data.player.money + treasure.amount,
+        'player.moneyScore': this.data.player.moneyScore + Math.floor(treasure.amount / 100)
       });
       this.showRewardAnimation(`宝箱开启：获得${treasure.amount}${treasure.text}！`);
     } else if (treasure.type === 'score') {
@@ -665,6 +673,7 @@ Page({
       const profit = currentMoney * levelMultiplier;  // 赢得金币也受等级影响
       this.setData({
         'player.money': currentMoney + profit,
+        'player.moneyScore': this.data.player.moneyScore + Math.floor(profit / 100),
         'stats.casinoWinStreak': this.data.stats.casinoWinStreak + 1,
         'stats.casinoProfit': this.data.stats.casinoProfit + profit
       });
@@ -674,6 +683,7 @@ Page({
       const loss = Math.floor(currentMoney / 2);
       this.setData({
         'player.money': currentMoney - loss,
+        'player.moneyScore': this.data.player.moneyScore - Math.floor(loss / 100),
         'stats.casinoWinStreak': 0
       });
       this.showRewardAnimation('赌场失败，损失一半金币...😢');
@@ -715,21 +725,24 @@ Page({
           switch(res.tapIndex) {
             case 0: // 护盾
               this.setData({
-                'player.money': currentMoney - selectedItem.price + selectedItem.reward
+                'player.money': currentMoney - selectedItem.price + selectedItem.reward,
+                'player.moneyScore': this.data.player.moneyScore + Math.floor(selectedItem.reward / 100)
               });
               this.showRewardAnimation(`使用${selectedItem.name}！\n-${selectedItem.price}金币\n+${selectedItem.reward}金币💰`);
               break;
 
             case 1: // 加分卡
               this.setData({
-                'player.money': currentMoney - selectedItem.price
+                'player.money': currentMoney - selectedItem.price,
+                'player.moneyScore': this.data.player.moneyScore - Math.floor(selectedItem.price / 100)
               });
               this.gainScore(selectedItem.reward);
               break;
 
             case 2: // 传送卡
               this.setData({
-                'player.money': currentMoney - selectedItem.price
+                'player.money': currentMoney - selectedItem.price,
+                'player.moneyScore': this.data.player.moneyScore - Math.floor(selectedItem.price / 100)
               });
               this.handlePortal();
               break;
@@ -751,6 +764,7 @@ Page({
 
     this.setData({
       'player.money': this.data.player.money + rewards.money,
+      'player.moneyScore': this.data.player.moneyScore + Math.floor(rewards.money / 100),
       'player.score': this.data.player.score + rewards.score
     });
 
@@ -969,5 +983,37 @@ ${this.data.player.exp}/${this.data.levelExp[newLevel]}`,
     const totalTarget = this.data.gameTarget.totalTarget;
     const { moneyTarget, happyTarget, honorTarget } = this.data.targetSetup;
     return totalTarget - (parseInt(moneyTarget) || 0) - (parseInt(happyTarget) || 0) - (parseInt(honorTarget) || 0);
+  },
+
+  // 更新玩家状态的方法
+  updatePlayerStatus(type, amount) {
+    switch(type) {
+      case 'money':
+        this.updatePlayerMoney(amount);
+        break;
+      case 'happy':
+        this.setData({
+          'player.happyScore': Math.max(0, this.data.player.happyScore + amount)
+        });
+        break;
+      case 'honor':
+        this.setData({
+          'player.honorScore': Math.max(0, this.data.player.honorScore + amount)
+        });
+        break;
+    }
+    
+    this.checkGameProgress();
+  },
+
+  // 更新玩家金币和积分
+  updatePlayerMoney(amount) {
+    const newMoney = Math.max(0, this.data.player.money + amount);
+    const newMoneyScore = Math.floor(newMoney / 100); // 每100金币=1积分
+    
+    this.setData({
+      'player.money': newMoney,
+      'player.moneyScore': newMoneyScore
+    });
   }
 }); 

@@ -16,16 +16,16 @@
     </view>
     <view class="player-stats">
       <view class="stat-item">
-        <view class="stat-icon">💰</view>
-        <view class="stat-value">{{player.money}}</view>
+        <text class="stat-icon">💰</text>
+        <text class="stat-value">{{player.money}}/{{player.moneyScore}}</text>
       </view>
       <view class="stat-item">
-        <view class="stat-icon">⭐</view>
-        <view class="stat-value">{{player.score}}/{{targetScore}}</view>
+        <text class="stat-icon">😊</text>
+        <text class="stat-value">{{player.happyScore}}</text>
       </view>
       <view class="stat-item">
-        <view class="stat-icon">🏆</view>
-        <view class="stat-value">{{player.achievements.length}}</view>
+        <text class="stat-icon">🏅</text>
+        <text class="stat-value">{{player.honorScore}}</text>
       </view>
     </view>
   </view>
