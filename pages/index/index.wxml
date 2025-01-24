@@ -30,38 +30,117 @@
     </view>
   </view>
 
-  <!-- 骰子区域 -->
-  <view class="dice-section">
-    <view class="dice-wrapper">
-      <view class="dice {{diceAnimating ? 'dice-animate' : ''}}" 
-            style="transform: rotate({{diceRotation}}deg)">
-        <text class="dice-face">{{diceFaces[diceNumber]}}</text>
+  <!-- 游戏地图区域 -->
+  <view class="map-container">
+    <!-- 外圈格子 -->
+    <view class="outer-circle">
+      <view wx:for="{{mapCells.outer}}" 
+            wx:key="id" 
+            class="cell {{player.position === item.id ? 'current' : ''}}">
+        <view class="cell-icon">
+          <image src="{{item.icon}}" mode="aspectFit"></image>
+        </view>
+        <view class="cell-name">{{item.name}}</view>
       </view>
-      <view class="dice-shadow {{diceAnimating ? 'shadow-animate' : ''}}"></view>
     </view>
-    <button class="roll-button {{diceAnimating ? 'button-disabled' : ''}}" 
-            bindtap="rollDice" 
-            disabled="{{gameOver || diceAnimating}}">
-      {{diceAnimating ? '骰子翻滚中...' : '掷骰子'}}
-    </button>
+    
+    <!-- 通道格子 -->
+    <view class="channels">
+      <view wx:if="{{currentChannel}}" class="channel-cells">
+        <view wx:for="{{mapCells.channels[currentChannel]}}" 
+              wx:key="id" 
+              class="cell {{player.channelPosition === item.id ? 'current' : ''}}">
+          <view class="cell-icon">
+            <image src="{{item.icon}}" mode="aspectFit"></image>
+          </view>
+          <view class="cell-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 骰子和控制区 -->
+    <view class="controls">
+      <view class="dice-btn {{isRolling ? 'disabled' : ''}}" bindtap="rollDice">
+        <view class="dice {{isRolling ? 'rolling' : ''}}">
+          <block wx:if="{{diceNumber}}">
+            <view class="dice-dots" wx:if="{{!isRolling}}">
+              <block wx:if="{{diceNumber === 1}}">
+                <view wx:for="{{8}}" wx:key="index"></view>
+                <view class="dot"></view>
+              </block>
+              <block wx:elif="{{diceNumber === 2}}">
+                <view class="dot"></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view class="dot"></view>
+              </block>
+              <block wx:elif="{{diceNumber === 3}}">
+                <view class="dot"></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view class="dot"></view>
+              </block>
+              <block wx:elif="{{diceNumber === 4}}">
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+              </block>
+              <block wx:elif="{{diceNumber === 5}}">
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+              </block>
+              <block wx:elif="{{diceNumber === 6}}">
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+                <view class="dot"></view>
+                <view></view>
+                <view class="dot"></view>
+              </block>
+            </view>
+            <view class="dice-number" wx:else>{{diceNumber}}</view>
+          </block>
+          <view class="dice-number" wx:else>🎲</view>
+        </view>
+      </view>
+      <view class="action-buttons">
+        <button wx:if="{{showChannelEnter}}" 
+                bindtap="enterChannel">进入通道</button>
+        <button wx:if="{{showStayOption}}" 
+                bindtap="stayCurrentCell">停留此处</button>
+      </view>
+    </view>
   </view>
 
   <!-- 奖励提示 -->
   <view class="reward-popup {{showReward ? 'show-reward' : ''}}">
     {{rewardText}}
-  </view>
-
-  <!-- 游戏地图 -->
-  <view class="game-map">
-    <view wx:for="{{mapCells}}" 
-          wx:key="id" 
-          class="map-cell {{player.position === index ? 'current' : ''}}">
-      <view class="cell-icon">{{item.icon}}</view>
-      <view class="cell-content">
-        <text class="cell-name">{{item.name}}</text>
-        <text class="cell-desc">{{item.description}}</text>
-      </view>
-    </view>
   </view>
 </view>
 

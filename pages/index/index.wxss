@@ -52,25 +52,97 @@
   margin-bottom: 40rpx;
 }
 
+/* 骰子样式 */
+.dice-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  perspective: 1000px;
+  margin: 20px auto;
+}
+
 .dice {
   width: 100%;
   height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.3s;
   background: white;
-  border-radius: 20rpx;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
-  transform-style: preserve-3d;
-  transition: transform 0.1s ease;
-  position: relative;
-  z-index: 2;
 }
 
-.dice-face {
-  font-size: 80rpx;
+.dice-number {
+  font-size: 32px;
+  font-weight: bold;
   color: #333;
-  transform-style: preserve-3d;
+}
+
+.dice.rolling {
+  animation: diceRoll 0.8s ease-out;
+}
+
+@keyframes diceRoll {
+  0% {
+    transform: rotateX(0) rotateY(0) rotateZ(0);
+  }
+  25% {
+    transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg);
+  }
+  50% {
+    transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg);
+  }
+  75% {
+    transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg);
+  }
+  100% {
+    transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg);
+  }
+}
+
+/* 骰子点数样式 */
+.dice-dots {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border-radius: 50%;
+  margin: auto;
+}
+
+/* 骰子按钮效果 */
+.dice-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 20px auto;
+}
+
+.dice-btn:active {
+  box-shadow: inset 5px 5px 10px #d1d1d1, inset -5px -5px 10px #ffffff;
+  transform: scale(0.95);
 }
 
 .dice-shadow {
@@ -174,8 +246,15 @@
 }
 
 .cell-icon {
-  font-size: 48rpx;
-  margin-right: 20rpx;
+  width: min(40px, 10vw);
+  height: min(40px, 10vw);
+  margin-bottom: 4px;
+}
+
+.cell-icon image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .cell-content {
@@ -610,4 +689,211 @@ button[disabled] {
 
 .lottery-btn:active {
   transform: scale(0.98);
+}
+
+/* 优化布局适应手机屏幕 */
+.map-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 10px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.outer-circle {
+  width: 100%;
+  height: auto;
+  max-width: 600px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(100% / 5), 1fr));
+  gap: 5px;
+  padding: 8px;
+  background: #f5f5f5;
+  box-sizing: border-box;
+}
+
+.cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.cell-icon {
+  width: min(36px, 8vw);
+  height: min(36px, 8vw);
+  margin-bottom: 4px;
+}
+
+.cell-name {
+  font-size: min(10px, 2.2vw);
+  text-align: center;
+  line-height: 1.1;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding: 0 2px;
+}
+
+.channels {
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+  margin-bottom: 60px;
+}
+
+.channel-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(100% / 6), 1fr));
+  gap: 5px;
+  padding: 5px;
+}
+
+.controls {
+  position: sticky;
+  bottom: 0;
+  margin-top: 20px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.dice {
+  width: min(80px, 20vw);
+  height: min(80px, 20vw);
+  border: 3px solid #1890ff;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: min(40px, 10vw);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.dice.rolling {
+  animation: shake 0.3s infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg) scale(1.1); }
+  25% { transform: rotate(-20deg) scale(1.1); }
+  75% { transform: rotate(20deg) scale(1.1); }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.action-buttons button {
+  font-size: min(14px, 3.5vw);
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #1890ff;
+  color: #fff;
+  border: none;
+}
+
+/* 适配不同屏幕尺寸 */
+@media screen and (min-width: 768px) {
+  .cell-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .cell-name {
+    font-size: 14px;
+  }
+  
+  .dice {
+    width: 100px;
+    height: 100px;
+    font-size: 48px;
+  }
+}
+
+/* 适配刘海屏 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .controls {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
+  }
+}
+
+/* 适配小屏幕 */
+@media screen and (max-width: 320px) {
+  .outer-circle {
+    grid-template-columns: repeat(auto-fill, minmax(calc(100% / 4), 1fr));
+  }
+  
+  .cell-icon {
+    width: min(32px, 7vw);
+    height: min(32px, 7vw);
+  }
+  
+  .cell-name {
+    font-size: min(9px, 2vw);
+  }
+}
+
+/* 适配大屏幕 */
+@media screen and (min-width: 768px) {
+  .outer-circle {
+    grid-template-columns: repeat(auto-fill, minmax(calc(100% / 6), 1fr));
+  }
+  
+  .cell-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .cell-name {
+    font-size: 12px;
+  }
+}
+
+/* 添加新样式 */
+.game-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.player-status {
+  width: 100%;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.disabled {
+  opacity: 0.7;
+  pointer-events: none;
 } 
