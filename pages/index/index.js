@@ -131,7 +131,17 @@ Page({
       honorTarget: 0
     },
     showTargetSetup: false,
-    remaining: 0
+    remaining: 0,
+    lottery: {
+      isSpinning: false,
+      showLottery: false,
+      rewards: [
+        { value: 500, text: '500金币' },
+        { value: 1000, text: '1000金币' },
+        { value: 1500, text: '1500金币' }
+      ],
+      selectedIndex: 0
+    }
   },
 
   onLoad() {
@@ -226,16 +236,64 @@ Page({
   // 开始游戏
   startGame() {
     const { difficulty, moneyTarget, happyTarget, honorTarget } = this.data.gameTarget;
-    const difficultyName = this.data.difficultySettings[difficulty].name;
-    
     wx.showModal({
       title: '游戏开始！',
-      content: `难度：${difficultyName}\n\n目标：\n金钱值：${moneyTarget}\n幸福值：${happyTarget}\n名誉值：${honorTarget}\n\n开始你的冒险吧！`,
+      content: `难度：${this.data.difficultySettings[difficulty].name}\n\n目标：\n金钱值：${moneyTarget}\n幸福值：${happyTarget}\n名誉值：${honorTarget}\n\n让我们先抽取你的起始资金吧！`,
       showCancel: false,
       success: () => {
-        this.initGame();
+        this.setData({
+          'lottery.showLottery': true,
+          'lottery.selectedIndex': 0
+        });
       }
     });
+  },
+
+  // 开始抽奖
+  startLottery() {
+    if (this.data.lottery.isSpinning) return;
+    
+    this.setData({
+      'lottery.isSpinning': true
+    });
+
+    // 随机转动次数（6-10圈）
+    const rounds = 6 + Math.floor(Math.random() * 5);
+    // 随机最终位置（0-2）
+    const finalIndex = Math.floor(Math.random() * 3);
+    // 计算总步数
+    const totalSteps = rounds * 3 + finalIndex;
+    
+    let currentStep = 0;
+    const spinInterval = setInterval(() => {
+      currentStep++;
+      this.setData({
+        'lottery.selectedIndex': currentStep % 3
+      });
+
+      if (currentStep >= totalSteps) {
+        clearInterval(spinInterval);
+        this.setData({
+          'lottery.isSpinning': false
+        });
+        
+        const reward = this.data.lottery.rewards[finalIndex];
+        setTimeout(() => {
+          wx.showModal({
+            title: '恭喜！',
+            content: `你获得了 ${reward.text}！`,
+            showCancel: false,
+            success: () => {
+              this.setData({
+                'player.money': reward.value,
+                'lottery.showLottery': false
+              });
+              this.initGame();
+            }
+          });
+        }, 500);
+      }
+    }, 100);
   },
 
   initGame() {

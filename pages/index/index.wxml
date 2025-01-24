@@ -161,3 +161,22 @@
   </view>
 </view>
 
+<!-- 修改抽奖模态框 -->
+<view class="lottery-modal" wx:if="{{lottery.showLottery}}">
+  <view class="lottery-box">
+    <view class="lottery-title">抽取起始资金</view>
+    <view class="lottery-items">
+      <view class="lottery-item {{lottery.selectedIndex === index ? 'selected' : ''}}" 
+            wx:for="{{lottery.rewards}}" 
+            wx:key="value">
+        <text>{{item.text}}</text>
+      </view>
+    </view>
+    <button class="lottery-btn {{lottery.isSpinning ? 'spinning' : ''}}" 
+            bindtap="startLottery" 
+            disabled="{{lottery.isSpinning}}">
+      {{lottery.isSpinning ? '抽奖中...' : '点击抽奖'}}
+    </button>
+  </view>
+</view>
+
